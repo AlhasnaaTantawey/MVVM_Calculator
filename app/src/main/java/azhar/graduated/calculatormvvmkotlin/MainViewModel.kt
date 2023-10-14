@@ -13,17 +13,16 @@ class MainViewModel(application: Application):AndroidViewModel(application) {
    private var currentNumber = MutableLiveData<String>("")
     private var resultNumber = MutableLiveData<String>("")
      var outPutLiveData = MediatorLiveData<String>()
+    var lastExpression:LiveData<LastExpression>
     var publicCurrentNumber:LiveData<String> =currentNumber
   private  var  firstNumber = 0
  private   var secondNumber = 0
     private  var operation =""
+    val db:ResultRoomDatabase=Room.databaseBuilder(getApplication<Application>().applicationContext,
+        ResultRoomDatabase::class.java,"mydatabase"
+    ).allowMainThreadQueries().build()
 
     init {
-        val db =Room.databaseBuilder(getApplication<Application>().applicationContext,
-            ResultRoomDatabase::class.java,"mydatabase"
-        ).build()
-
-        db.resultDao().insert(LastExpression(result = "2+3=5"))
 
         outPutLiveData.addSource(currentNumber){
             outPutLiveData.value=it
@@ -31,6 +30,8 @@ class MainViewModel(application: Application):AndroidViewModel(application) {
         outPutLiveData.addSource(resultNumber){
             outPutLiveData.value=it
         }
+
+        lastExpression= db.resultDao().getLastItem()
     }
 
     fun plusOnClick(){
@@ -50,6 +51,9 @@ class MainViewModel(application: Application):AndroidViewModel(application) {
       when(operation){
           "+" -> resultNumber.value=(firstNumber+secondNumber).toString()
       }
+
+       val lastExp=LastExpression(result = "$firstNumber$operation$secondNumber=${resultNumber.value}")
+      db.resultDao().insert(lastExp)
   }
 
 
@@ -85,5 +89,8 @@ class MainViewModel(application: Application):AndroidViewModel(application) {
         currentNumber.value="${currentNumber.value}9"
     }
 
+    fun numberZeroOnClick(){
+        currentNumber.value="${currentNumber.value}0"
+    }
 
 }
