@@ -1,5 +1,6 @@
 package azhar.graduated.calculatormvvmkotlin
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity() {
         binding=ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         viewModel=ViewModelProvider(this).get(MainViewModel::class.java)
 
         viewModel.outPutLiveData.observe(this){
@@ -23,6 +25,12 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.lastExpression.observe(this){
             binding.textViewOutputresult.text=it.result
+        }
+
+        binding.mainActivityImageButton.setOnClickListener{
+
+            val intent=Intent(this,AllOperationsActivity::class.java)
+           startActivity(intent)
         }
 
 }
